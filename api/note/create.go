@@ -71,7 +71,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// cooldown
-	latest, err := db.LatestNoteTime(note.SteamID)
+	latest, err := db.LatestNoteTime(note.SteamID, note.Map)
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to get latest post time: %s", err), http.StatusInternalServerError)
 		return

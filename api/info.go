@@ -59,15 +59,15 @@ func Info(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// note cooldown
-	latest, err := db.LatestNoteTime(steamid)
-	if err != nil {
-		common.WriteError(w, r, fmt.Sprintf("failed to get latest note time: %s", err), http.StatusInternalServerError)
-		return
-	}
-
 	mapname := strings.TrimSpace(r.URL.Query().Get("map"))
 	if !common.IsValidMap(mapname) {
 		common.WriteError(w, r, "invalid map", http.StatusBadRequest)
+		return
+	}
+
+	latest, err := db.LatestNoteTime(steamid, mapname)
+	if err != nil {
+		common.WriteError(w, r, fmt.Sprintf("failed to get latest note time: %s", err), http.StatusInternalServerError)
 		return
 	}
 

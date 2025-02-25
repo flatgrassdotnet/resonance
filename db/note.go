@@ -59,9 +59,9 @@ func DeleteNote(id int) error {
 	return nil
 }
 
-func LatestNoteTime(steamid string) (time.Time, error) {
+func LatestNoteTime(steamid string, mapname string) (time.Time, error) {
 	var created time.Time
-	err := conn.QueryRow("SELECT COALESCE(MAX(created), FROM_UNIXTIME(946702800)) FROM notes WHERE steamid = ?", steamid).Scan(&created)
+	err := conn.QueryRow("SELECT COALESCE(MAX(created), FROM_UNIXTIME(946702800)) FROM notes WHERE steamid = ? AND map = ?", steamid, mapname).Scan(&created)
 	if err != nil {
 		return time.UnixMilli(0), err
 	}
