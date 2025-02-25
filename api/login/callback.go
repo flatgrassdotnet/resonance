@@ -63,5 +63,5 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write([]byte("Successfully logged in! You can close this window now."))
+	http.Redirect(w, r, "/authok.html", http.StatusSeeOther)
 }
