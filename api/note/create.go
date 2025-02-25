@@ -34,12 +34,14 @@ import (
 func Create(w http.ResponseWriter, r *http.Request) {
 	var note db.Note
 
+	// token
 	token, err := base64.StdEncoding.DecodeString(r.Header.Get("Authorization"))
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to decode token: %s", err), http.StatusInternalServerError)
 		return
 	}
 
+	// steamid
 	note.SteamID, err = db.SteamIDFromToken(token)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -61,13 +63,27 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// map
+	note.Map = strings.TrimSpace(r.PostFormValue("map"))
+	if !common.IsValidMap(note.Map) {
+		common.WriteError(w, r, "invalid map", http.StatusBadRequest)
+		return
+	}
+
+	// cooldown
 	latest, err := db.LatestNoteTime(note.SteamID)
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to get latest post time: %s", err), http.StatusInternalServerError)
 		return
 	}
 
-	if latest.Add(time.Second * 10).After(time.Now().UTC()) {
+	notes, err := db.GetNoteCountByUserMap(note.SteamID, note.Map)
+	if err != nil {
+		common.WriteError(w, r, fmt.Sprintf("failed to get note count: %s", err), http.StatusInternalServerError)
+		return
+	}
+
+	if latest.Add(time.Minute * time.Duration(notes)).After(time.Now().UTC()) {
 		common.WriteError(w, r, "rate limited", http.StatusTooManyRequests)
 		return
 	}
@@ -92,13 +108,6 @@ func Create(w http.ResponseWriter, r *http.Request) {
 			common.WriteError(w, r, "invalid pos", http.StatusBadRequest)
 			return
 		}
-	}
-
-	// map
-	note.Map = strings.TrimSpace(r.PostFormValue("map"))
-	if !common.IsValidMap(note.Map) {
-		common.WriteError(w, r, "invalid map", http.StatusBadRequest)
-		return
 	}
 
 	// proximity check

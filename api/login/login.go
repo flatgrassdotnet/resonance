@@ -33,6 +33,7 @@ var (
 )
 
 func Login(w http.ResponseWriter, r *http.Request) {
+	// ticket
 	ticket, err := hex.DecodeString(r.URL.Query().Get("ticket"))
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to decode ticket: %s", err), http.StatusBadRequest)

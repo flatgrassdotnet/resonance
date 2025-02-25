@@ -39,12 +39,14 @@ type InfoResponse struct {
 func Info(w http.ResponseWriter, r *http.Request) {
 	var ir InfoResponse
 
+	// token
 	token, err := base64.StdEncoding.DecodeString(r.Header.Get("Authorization"))
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to decode token: %s", err), http.StatusInternalServerError)
 		return
 	}
 
+	// steamid
 	steamid, err := db.SteamIDFromToken(token)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

@@ -34,12 +34,14 @@ import (
 func Report(w http.ResponseWriter, r *http.Request) {
 	var report db.Report
 
+	// token
 	token, err := base64.StdEncoding.DecodeString(r.Header.Get("Authorization"))
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to decode token: %s", err), http.StatusInternalServerError)
 		return
 	}
 
+	// steamid
 	report.SteamID, err = db.SteamIDFromToken(token)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -51,6 +53,7 @@ func Report(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// muted check
 	u, err := db.GetUser(report.SteamID)
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to get user: %s", err), http.StatusInternalServerError)
@@ -61,6 +64,7 @@ func Report(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// cooldown
 	latest, err := db.LatestReportTime(report.SteamID)
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to get latest post time: %s", err), http.StatusInternalServerError)

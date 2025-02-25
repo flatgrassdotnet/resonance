@@ -41,12 +41,14 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// token
 	token, err := base64.StdEncoding.DecodeString(r.Header.Get("Authorization"))
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to decode token: %s", err), http.StatusInternalServerError)
 		return
 	}
 
+	// steamid
 	steamid, err := db.SteamIDFromToken(token)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -58,6 +60,7 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// owner check
 	owner, err := db.GetNoteOwner(id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
