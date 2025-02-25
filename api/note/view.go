@@ -47,6 +47,11 @@ func View(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// strip steamid
+	for i := range vr.Notes {
+		vr.Notes[i].SteamID = ""
+	}
+
 	w.Header().Set("Content-Type", "text/json")
 	err = json.NewEncoder(w).Encode(vr)
 	if err != nil {

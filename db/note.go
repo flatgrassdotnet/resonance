@@ -25,7 +25,7 @@ import (
 type Note struct {
 	Map      string     `json:"map"`
 	ID       int        `json:"id"`
-	SteamID  string     `json:"steamid"`
+	SteamID  string     `json:"steamid,omitempty"`
 	Comment  string     `json:"comment"`
 	Position [3]float64 `json:"position"`
 	Created  time.Time  `json:"created"`
