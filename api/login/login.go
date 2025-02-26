@@ -27,11 +27,6 @@ import (
 	"github.com/yohcop/openid-go"
 )
 
-var (
-	nonceStore     = openid.NewSimpleNonceStore()
-	discoveryCache = openid.NewSimpleDiscoveryCache()
-)
-
 func Login(w http.ResponseWriter, r *http.Request) {
 	// ticket
 	ticket, err := hex.DecodeString(r.URL.Query().Get("ticket"))

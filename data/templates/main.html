@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		{{if ne .Header ""}}<title>{{.Header}}</title>{{end}}
+		<style>
+			body {
+				background-color: rgb(25, 25, 25);
+				text-align: center;
+				color: rgb(200, 200, 200);
+				font-family: Arial, sans-serif;
+
+				background-image: url("/img/echo_background.png");
+				background-repeat: no-repeat;
+				background-attachment: fixed;
+				background-position: center;
+
+				white-space: pre-line;
+				overflow-y: hidden;
+			}
+			body {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				flex-direction: column;
+				height: 100vh;
+			}
+		</style>
+	</head>
+	<body>
+		{{if ne .Header ""}}<h1 style="color: white;">{{.Header}}</h1>{{end}}
+		{{if ne .Body ""}}<p>{{.Body}}</p>{{end}}
+		{{if ne .Footer ""}}<p>{{.Footer}}</p>{{end}}
+	</body>
+</html>

@@ -54,7 +54,7 @@ func main() {
 	// set up webserver
 
 	// files
-	http.Handle("GET /", http.FileServer(http.Dir("html")))
+	http.Handle("GET /img/", http.FileServer(http.Dir("data")))
 
 	// login
 	http.HandleFunc("GET /login", login.Login)
