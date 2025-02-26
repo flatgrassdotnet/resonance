@@ -32,14 +32,14 @@ import (
 )
 
 func Report(w http.ResponseWriter, r *http.Request) {
-	var report db.Report
-
 	// token
 	token, err := base64.StdEncoding.DecodeString(r.Header.Get("Authorization"))
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to decode token: %s", err), http.StatusInternalServerError)
 		return
 	}
+
+	var report db.Report
 
 	// steamid
 	report.SteamID, err = db.SteamIDFromToken(token)

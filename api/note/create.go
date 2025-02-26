@@ -32,14 +32,14 @@ import (
 )
 
 func Create(w http.ResponseWriter, r *http.Request) {
-	var note db.Note
-
 	// token
 	token, err := base64.StdEncoding.DecodeString(r.Header.Get("Authorization"))
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to decode token: %s", err), http.StatusInternalServerError)
 		return
 	}
+
+	var note db.Note
 
 	// steamid
 	note.SteamID, err = db.SteamIDFromToken(token)

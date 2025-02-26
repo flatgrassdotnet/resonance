@@ -37,8 +37,6 @@ type InfoResponse struct {
 }
 
 func Info(w http.ResponseWriter, r *http.Request) {
-	var ir InfoResponse
-
 	// token
 	token, err := base64.StdEncoding.DecodeString(r.Header.Get("Authorization"))
 	if err != nil {
@@ -76,6 +74,8 @@ func Info(w http.ResponseWriter, r *http.Request) {
 		common.WriteError(w, r, fmt.Sprintf("failed to get note count: %s", err), http.StatusInternalServerError)
 		return
 	}
+
+	var ir InfoResponse
 
 	ir.NoteCooldown = max(0, int(time.Until(latest.Add(time.Minute*time.Duration(notes))).Seconds()))
 

@@ -24,10 +24,9 @@ import (
 )
 
 func WriteError(w http.ResponseWriter, r *http.Request, error string, code int) error {
-	var e db.Error
-
 	http.Error(w, error, code)
 
+	var e db.Error
 	e.Endpoint = r.URL.Path
 	e.Error = error
 
