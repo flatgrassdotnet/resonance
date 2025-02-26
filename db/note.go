@@ -110,7 +110,7 @@ func GetNotes(filter string, value string) ([]Note, error) {
 
 func GetNoteOwner(id int) (string, error) {
 	var steamid string
-	err := conn.QueryRow("SELECT steamid FROM notes WHERE id = ?").Scan(&steamid)
+	err := conn.QueryRow("SELECT steamid FROM notes WHERE id = ?", id).Scan(&steamid)
 	if err != nil {
 		return "", err
 	}
