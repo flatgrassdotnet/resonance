@@ -39,7 +39,8 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	url, err := openid.RedirectURL("https://steamcommunity.com/openid", fmt.Sprintf("https://%s/login/callback?ticket=%x", r.Host, ticket), fmt.Sprintf("https://%s", r.Host))
+	//url, err := openid.RedirectURL("https://steamcommunity.com/openid", fmt.Sprintf("https://%s/login/callback?ticket=%x", r.Host, ticket), fmt.Sprintf("https://%s", r.Host))
+	url, err := openid.BuildRedirectURL("https://steamcommunity.com/openid/login", "http://specs.openid.net/auth/2.0/identifier_select", "http://specs.openid.net/auth/2.0/identifier_select", fmt.Sprintf("https://%s/login/callback?ticket=%x", r.Host, ticket), fmt.Sprintf("https://%s", r.Host))
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to create login redirect: %s", err), http.StatusInternalServerError)
 		return
