@@ -20,7 +20,7 @@ package db
 
 func GetUserCount() (int, error) {
 	var count int
-	err := conn.QueryRow("SELECT COUNT(DISTINCT steamid) FROM notes").Scan(&count)
+	err := conn.QueryRow("SELECT COUNT(DISTINCT author) FROM notes").Scan(&count)
 	if err != nil {
 		return 0, err
 	}
@@ -40,7 +40,7 @@ func GetNoteCount() (int, error) {
 
 func GetNoteCountByUserMap(steamid string, mapname string) (int, error) {
 	var count int
-	err := conn.QueryRow("SELECT COUNT(*) FROM notes WHERE steamid = ? AND map = ?", steamid, mapname).Scan(&count)
+	err := conn.QueryRow("SELECT COUNT(*) FROM notes WHERE author = ? AND map = ?", steamid, mapname).Scan(&count)
 	if err != nil {
 		return 0, err
 	}

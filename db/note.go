@@ -38,7 +38,7 @@ func InsertNote(note Note) (int, error) {
 		return 0, err
 	}
 
-	r, err := conn.Exec("INSERT INTO notes (steamid, map, position, comment) VALUES (?, ?, VEC_FromText(?), ?)", note.Author, note.Map, pos, note.Comment)
+	r, err := conn.Exec("INSERT INTO notes (author, map, position, comment) VALUES (?, ?, VEC_FromText(?), ?)", note.Author, note.Map, pos, note.Comment)
 	if err != nil {
 		return 0, err
 	}
@@ -62,7 +62,7 @@ func DeleteNote(id int) error {
 
 func LatestNoteTime(steamid string, mapname string) (time.Time, error) {
 	var created time.Time
-	err := conn.QueryRow("SELECT COALESCE(MAX(created), FROM_UNIXTIME(946702800)) FROM notes WHERE steamid = ? AND map = ?", steamid, mapname).Scan(&created)
+	err := conn.QueryRow("SELECT COALESCE(MAX(created), FROM_UNIXTIME(946702800)) FROM notes WHERE author = ? AND map = ?", steamid, mapname).Scan(&created)
 	if err != nil {
 		return time.UnixMilli(0), err
 	}
@@ -72,11 +72,11 @@ func LatestNoteTime(steamid string, mapname string) (time.Time, error) {
 
 func GetNotes(filter string, value string) ([]Note, error) {
 	var args []any
-	query := "SELECT n.id, n.steamid, u.admin, n.map, VEC_ToText(n.position), n.comment, n.created FROM notes n JOIN users u ON n.steamid = u.steamid"
+	query := "SELECT n.id, n.author, u.admin, n.map, VEC_ToText(n.position), n.comment, n.created FROM notes n JOIN users u ON n.author = u.steamid"
 
 	switch filter {
 	case "steamid":
-		query += " WHERE n.steamid = ?"
+		query += " WHERE n.author = ?"
 		args = append(args, value)
 	case "map":
 		query += " WHERE n.map = ?"
@@ -111,7 +111,7 @@ func GetNotes(filter string, value string) ([]Note, error) {
 
 func GetNoteOwner(id int) (string, error) {
 	var steamid string
-	err := conn.QueryRow("SELECT steamid FROM notes WHERE id = ?", id).Scan(&steamid)
+	err := conn.QueryRow("SELECT author FROM notes WHERE id = ?", id).Scan(&steamid)
 	if err != nil {
 		return "", err
 	}
