@@ -43,10 +43,8 @@ func main() {
 
 	flag.Parse()
 
-	var err error
-
 	// set up database
-	err = db.Init(*dbuser, *dbpass, *dbaddr, *dbname)
+	err := db.Init(*dbuser, *dbpass, *dbaddr, *dbname)
 	if err != nil {
 		log.Fatalf("failed to open database connection: %s", err)
 	}
