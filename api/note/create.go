@@ -42,7 +42,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	var note db.Note
 
 	// steamid
-	note.SteamID, err = db.SteamIDFromToken(token)
+	note.Author, err = db.SteamIDFromToken(token)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			common.WriteError(w, r, "invalid token", http.StatusUnauthorized)
@@ -53,7 +53,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u, err := db.GetUser(note.SteamID)
+	u, err := db.GetUser(note.Author)
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to get user: %s", err), http.StatusInternalServerError)
 		return
@@ -71,13 +71,13 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// cooldown
-	latest, err := db.LatestNoteTime(note.SteamID, note.Map)
+	latest, err := db.LatestNoteTime(note.Author, note.Map)
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to get latest post time: %s", err), http.StatusInternalServerError)
 		return
 	}
 
-	notes, err := db.GetNoteCountByUserMap(note.SteamID, note.Map)
+	notes, err := db.GetNoteCountByUserMap(note.Author, note.Map)
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to get note count: %s", err), http.StatusInternalServerError)
 		return

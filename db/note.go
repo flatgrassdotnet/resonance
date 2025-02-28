@@ -25,7 +25,8 @@ import (
 type Note struct {
 	Map      string     `json:"map"`
 	ID       int        `json:"id"`
-	SteamID  string     `json:"steamid,omitempty"`
+	Author   string     `json:"author,omitempty"`
+	Admin    bool       `json:"admin,omitempty"`
 	Comment  string     `json:"comment"`
 	Position [3]float64 `json:"position"`
 	Created  time.Time  `json:"created"`
@@ -37,7 +38,7 @@ func InsertNote(note Note) (int, error) {
 		return 0, err
 	}
 
-	r, err := conn.Exec("INSERT INTO notes (steamid, map, position, comment) VALUES (?, ?, VEC_FromText(?), ?)", note.SteamID, note.Map, pos, note.Comment)
+	r, err := conn.Exec("INSERT INTO notes (steamid, map, position, comment) VALUES (?, ?, VEC_FromText(?), ?)", note.Author, note.Map, pos, note.Comment)
 	if err != nil {
 		return 0, err
 	}
@@ -71,14 +72,14 @@ func LatestNoteTime(steamid string, mapname string) (time.Time, error) {
 
 func GetNotes(filter string, value string) ([]Note, error) {
 	var args []any
-	query := "SELECT id, steamid, map, VEC_ToText(position), comment, created FROM notes"
+	query := "SELECT n.id, n.steamid, u.admin, n.map, VEC_ToText(n.position), n.comment, n.created FROM notes n JOIN users u ON n.steamid = u.steamid"
 
 	switch filter {
 	case "steamid":
-		query += " WHERE steamid = ?"
+		query += " WHERE n.steamid = ?"
 		args = append(args, value)
 	case "map":
-		query += " WHERE map = ?"
+		query += " WHERE n.map = ?"
 		args = append(args, value)
 	}
 
@@ -92,7 +93,7 @@ func GetNotes(filter string, value string) ([]Note, error) {
 	for r.Next() {
 		var n Note
 		var pos string
-		err = r.Scan(&n.ID, &n.SteamID, &n.Map, &pos, &n.Comment, &n.Created)
+		err = r.Scan(&n.ID, &n.Author, &n.Admin, &n.Map, &pos, &n.Comment, &n.Created)
 		if err != nil {
 			return nil, err
 		}

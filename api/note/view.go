@@ -49,7 +49,7 @@ func View(w http.ResponseWriter, r *http.Request) {
 
 	// strip steamid
 	for i := range vr.Notes {
-		vr.Notes[i].SteamID = ""
+		vr.Notes[i].Author = ""
 	}
 
 	w.Header().Set("Content-Type", "text/json")
