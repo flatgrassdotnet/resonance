@@ -23,7 +23,7 @@ import (
 )
 
 type Note struct {
-	Map      string     `json:"map"`
+	Map      string     `json:"map,omitempty"`
 	ID       int        `json:"id"`
 	Author   string     `json:"author,omitempty"`
 	Admin    bool       `json:"admin,omitempty"`
