@@ -86,7 +86,7 @@ func Info(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ir.ReportCooldown = max(0, int(time.Until(latest.Add(time.Minute)).Seconds()))
+	ir.ReportCooldown = max(0, int(time.Until(latest.Add(time.Minute*5)).Seconds()))
 
 	w.Header().Set("Content-Type", "text/json")
 	err = json.NewEncoder(w).Encode(ir)

@@ -55,7 +55,6 @@ func View(w http.ResponseWriter, r *http.Request) {
 		vr.Notes[i].Map = ""
 	}
 
-
 	w.Header().Set("Content-Type", "text/json")
 	err = json.NewEncoder(w).Encode(vr)
 	if err != nil {

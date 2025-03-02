@@ -71,7 +71,7 @@ func Report(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if latest.Add(time.Minute).After(time.Now().UTC()) {
+	if latest.Add(time.Minute * 5).After(time.Now().UTC()) {
 		common.WriteError(w, r, "rate limited", http.StatusTooManyRequests)
 		return
 	}
