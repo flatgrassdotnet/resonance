@@ -85,7 +85,7 @@ func Report(w http.ResponseWriter, r *http.Request) {
 
 	// reason
 	report.Reason = strings.TrimSpace(r.PostFormValue("reason"))
-	if report.Reason == "" {
+	if report.Reason == "" || len(report.Reason) > 250 {
 		common.WriteError(w, r, "invalid reason", http.StatusBadRequest)
 		return
 	}
