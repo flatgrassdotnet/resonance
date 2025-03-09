@@ -48,7 +48,7 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// enforce endpoint
-	if r.URL.Query().Get("op_endpoint") != "https://steamcommunity.com/openid/login" {
+	if r.URL.Query().Get("openid.op_endpoint") != "https://steamcommunity.com/openid/login" {
 		common.WriteError(w, r, "invalid endpoint", http.StatusBadRequest)
 		return
 	}
