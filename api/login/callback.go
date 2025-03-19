@@ -47,6 +47,12 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// enforce endpoint
+	if r.URL.Query().Get("openid.op_endpoint") != "https://steamcommunity.com/openid/login" {
+		common.WriteError(w, r, "invalid endpoint", http.StatusBadRequest)
+		return
+	}
+
 	id, err := openid.Verify(fmt.Sprintf("https://%s%s", r.Host, r.URL), discoveryCache, nonceStore)
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("error while verifying login callback: %s", err), http.StatusInternalServerError)
