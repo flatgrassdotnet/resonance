@@ -96,7 +96,7 @@ func TokenFromTicket(ctx context.Context, ticket []byte) ([]byte, error) {
 
 func SteamIDFromToken(ctx context.Context, token []byte) (string, error) {
 	var steamid string
-	err := conn.QueryRowContext(ctx, "SELECT steamid FROM sessions WHERE token = ? AND created > DATE_SUB(UTC_TIMESTAMP(), INTERVAL 7 DAY)", token).Scan(&steamid)
+	err := conn.QueryRowContext(ctx, "SELECT steamid FROM sessions WHERE token = ? AND created > DATE_SUB(UTC_TIMESTAMP(), INTERVAL 1 MONTH)", token).Scan(&steamid)
 	if err != nil {
 		return "", err
 	}
