@@ -30,7 +30,7 @@ func WriteError(w http.ResponseWriter, r *http.Request, error string, code int) 
 	e.Endpoint = r.URL.Path
 	e.Error = error
 
-	err := db.InsertError(e)
+	err := db.InsertError(r.Context(), e)
 	if err != nil {
 		return err
 	}

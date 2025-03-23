@@ -45,7 +45,7 @@ func Info(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// steamid
-	steamid, err := db.SteamIDFromToken(token)
+	steamid, err := db.SteamIDFromToken(r.Context(), token)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			common.WriteError(w, r, "invalid token", http.StatusUnauthorized)
@@ -63,13 +63,13 @@ func Info(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	latest, err := db.LatestNoteTime(steamid, mapname)
+	latest, err := db.LatestNoteTime(r.Context(), steamid, mapname)
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to get latest note time: %s", err), http.StatusInternalServerError)
 		return
 	}
 
-	notes, err := db.GetNoteCountByUserMap(steamid, mapname)
+	notes, err := db.GetNoteCountByUserMap(r.Context(), steamid, mapname)
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to get note count: %s", err), http.StatusInternalServerError)
 		return
@@ -80,7 +80,7 @@ func Info(w http.ResponseWriter, r *http.Request) {
 	ir.NoteCooldown = max(0, int(time.Until(latest.Add(time.Minute*time.Duration(notes))).Seconds()))
 
 	// report cooldown
-	latest, err = db.LatestReportTime(steamid)
+	latest, err = db.LatestReportTime(r.Context(), steamid)
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to get latest report time: %s", err), http.StatusInternalServerError)
 		return

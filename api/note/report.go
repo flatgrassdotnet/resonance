@@ -42,7 +42,7 @@ func Report(w http.ResponseWriter, r *http.Request) {
 	var report db.Report
 
 	// steamid
-	report.SteamID, err = db.SteamIDFromToken(token)
+	report.SteamID, err = db.SteamIDFromToken(r.Context(), token)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			common.WriteError(w, r, "invalid token", http.StatusUnauthorized)
@@ -54,7 +54,7 @@ func Report(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// muted check
-	u, err := db.GetUser(report.SteamID)
+	u, err := db.GetUser(r.Context(), report.SteamID)
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to get user: %s", err), http.StatusInternalServerError)
 		return
@@ -65,7 +65,7 @@ func Report(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// cooldown
-	latest, err := db.LatestReportTime(report.SteamID)
+	latest, err := db.LatestReportTime(r.Context(), report.SteamID)
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to get latest post time: %s", err), http.StatusInternalServerError)
 		return
@@ -90,7 +90,7 @@ func Report(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = db.InsertReport(report)
+	_, err = db.InsertReport(r.Context(), report)
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to insert report: %s", err), http.StatusInternalServerError)
 		return

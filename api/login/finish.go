@@ -41,7 +41,7 @@ func Finish(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := db.TokenFromTicket(ticket)
+	token, err := db.TokenFromTicket(r.Context(), ticket)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			common.WriteError(w, r, "login not complete", http.StatusUnauthorized)

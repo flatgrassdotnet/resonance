@@ -41,7 +41,7 @@ func View(w http.ResponseWriter, r *http.Request) {
 	var vr ViewResponse
 	var err error
 
-	vr.Notes, err = db.GetNotes("map", r.URL.Query().Get("map"))
+	vr.Notes, err = db.GetNotes(r.Context(), "map", r.URL.Query().Get("map"))
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		common.WriteError(w, r, fmt.Sprintf("failed to read notes for map: %s", err), http.StatusInternalServerError)
 		return

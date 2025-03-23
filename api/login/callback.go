@@ -63,13 +63,13 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 
 	u.SteamID = strings.TrimPrefix(id, "https://steamcommunity.com/openid/id/")
 
-	err = db.InsertUser(u)
+	err = db.InsertUser(r.Context(), u)
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to insert user: %s", err), http.StatusInternalServerError)
 		return
 	}
 
-	err = db.InsertTicket(u.SteamID, ticket)
+	err = db.InsertTicket(r.Context(), u.SteamID, ticket)
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to insert link: %s", err), http.StatusInternalServerError)
 		return

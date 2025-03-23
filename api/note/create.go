@@ -42,7 +42,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	var note db.Note
 
 	// steamid
-	note.Author, err = db.SteamIDFromToken(token)
+	note.Author, err = db.SteamIDFromToken(r.Context(), token)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			common.WriteError(w, r, "invalid token", http.StatusUnauthorized)
@@ -53,7 +53,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u, err := db.GetUser(note.Author)
+	u, err := db.GetUser(r.Context(), note.Author)
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to get user: %s", err), http.StatusInternalServerError)
 		return
@@ -71,13 +71,13 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// cooldown
-	latest, err := db.LatestNoteTime(note.Author, note.Map)
+	latest, err := db.LatestNoteTime(r.Context(), note.Author, note.Map)
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to get latest post time: %s", err), http.StatusInternalServerError)
 		return
 	}
 
-	notes, err := db.GetNoteCountByUserMap(note.Author, note.Map)
+	notes, err := db.GetNoteCountByUserMap(r.Context(), note.Author, note.Map)
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to get note count: %s", err), http.StatusInternalServerError)
 		return
@@ -111,7 +111,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// proximity check
-	hasNote, err := db.HasNoteWithinDistance(note.Map, note.Position, 70)
+	hasNote, err := db.HasNoteWithinDistance(r.Context(), note.Map, note.Position, 70)
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to determine note proximity: %s", err), http.StatusInternalServerError)
 		return
@@ -121,7 +121,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	id, err := db.InsertNote(note)
+	id, err := db.InsertNote(r.Context(), note)
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to insert note: %s", err), http.StatusInternalServerError)
 		return

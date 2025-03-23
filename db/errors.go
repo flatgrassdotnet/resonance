@@ -18,7 +18,10 @@
 
 package db
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 type Error struct {
 	Endpoint string    `json:"endpoint"`
@@ -26,8 +29,8 @@ type Error struct {
 	Created  time.Time `json:"created"`
 }
 
-func InsertError(e Error) error {
-	_, err := conn.Exec("INSERT INTO errors (endpoint, error) VALUES (?, ?)", e.Endpoint, e.Error)
+func InsertError(ctx context.Context, e Error) error {
+	_, err := conn.ExecContext(ctx, "INSERT INTO errors (endpoint, error) VALUES (?, ?)", e.Endpoint, e.Error)
 	if err != nil {
 		return err
 	}

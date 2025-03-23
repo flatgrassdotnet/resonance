@@ -19,6 +19,7 @@
 package db
 
 import (
+	"context"
 	"time"
 )
 
@@ -32,13 +33,13 @@ type Note struct {
 	Created  time.Time  `json:"created"`
 }
 
-func InsertNote(note Note) (int, error) {
+func InsertNote(ctx context.Context, note Note) (int, error) {
 	pos, err := toVectorJSON(note.Position)
 	if err != nil {
 		return 0, err
 	}
 
-	r, err := conn.Exec("INSERT INTO notes (author, map, position, comment) VALUES (?, ?, VEC_FromText(?), ?)", note.Author, note.Map, pos, note.Comment)
+	r, err := conn.ExecContext(ctx, "INSERT INTO notes (author, map, position, comment) VALUES (?, ?, VEC_FromText(?), ?)", note.Author, note.Map, pos, note.Comment)
 	if err != nil {
 		return 0, err
 	}
@@ -51,8 +52,8 @@ func InsertNote(note Note) (int, error) {
 	return int(id), err
 }
 
-func DeleteNote(id int) error {
-	_, err := conn.Exec("DELETE FROM notes WHERE id = ?", id)
+func DeleteNote(ctx context.Context, id int) error {
+	_, err := conn.ExecContext(ctx, "DELETE FROM notes WHERE id = ?", id)
 	if err != nil {
 		return err
 	}
@@ -60,9 +61,9 @@ func DeleteNote(id int) error {
 	return nil
 }
 
-func LatestNoteTime(steamid string, mapname string) (time.Time, error) {
+func LatestNoteTime(ctx context.Context, steamid string, mapname string) (time.Time, error) {
 	var created time.Time
-	err := conn.QueryRow("SELECT COALESCE(MAX(created), FROM_UNIXTIME(946702800)) FROM notes WHERE author = ? AND map = ?", steamid, mapname).Scan(&created)
+	err := conn.QueryRowContext(ctx, "SELECT COALESCE(MAX(created), FROM_UNIXTIME(946702800)) FROM notes WHERE author = ? AND map = ?", steamid, mapname).Scan(&created)
 	if err != nil {
 		return time.UnixMilli(0), err
 	}
@@ -70,7 +71,7 @@ func LatestNoteTime(steamid string, mapname string) (time.Time, error) {
 	return created, nil
 }
 
-func GetNotes(filter string, value string) ([]Note, error) {
+func GetNotes(ctx context.Context, filter string, value string) ([]Note, error) {
 	var args []any
 	query := "SELECT n.id, n.author, u.admin, n.map, VEC_ToText(n.position), n.comment, n.created FROM notes n JOIN users u ON n.author = u.steamid"
 
@@ -83,7 +84,7 @@ func GetNotes(filter string, value string) ([]Note, error) {
 		args = append(args, value)
 	}
 
-	r, err := conn.Query(query, args...)
+	r, err := conn.QueryContext(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
@@ -109,9 +110,9 @@ func GetNotes(filter string, value string) ([]Note, error) {
 	return notes, nil
 }
 
-func GetNoteOwner(id int) (string, error) {
+func GetNoteOwner(ctx context.Context, id int) (string, error) {
 	var steamid string
-	err := conn.QueryRow("SELECT author FROM notes WHERE id = ?", id).Scan(&steamid)
+	err := conn.QueryRowContext(ctx, "SELECT author FROM notes WHERE id = ?", id).Scan(&steamid)
 	if err != nil {
 		return "", err
 	}
@@ -119,14 +120,14 @@ func GetNoteOwner(id int) (string, error) {
 	return steamid, nil
 }
 
-func HasNoteWithinDistance(mapname string, position [3]float64, distance int) (bool, error) {
+func HasNoteWithinDistance(ctx context.Context, mapname string, position [3]float64, distance int) (bool, error) {
 	pos, err := toVectorJSON(position)
 	if err != nil {
 		return false, err
 	}
 
 	var count int
-	err = conn.QueryRow("SELECT COUNT(*) FROM notes WHERE map = ? AND VEC_DISTANCE_EUCLIDEAN(VEC_FromText(?), position) < ?", mapname, pos, distance).Scan(&count)
+	err = conn.QueryRowContext(ctx, "SELECT COUNT(*) FROM notes WHERE map = ? AND VEC_DISTANCE_EUCLIDEAN(VEC_FromText(?), position) < ?", mapname, pos, distance).Scan(&count)
 	if err != nil {
 		return false, err
 	}

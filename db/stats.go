@@ -18,9 +18,11 @@
 
 package db
 
-func GetUserCount() (int, error) {
+import "context"
+
+func GetUserCount(ctx context.Context) (int, error) {
 	var count int
-	err := conn.QueryRow("SELECT COUNT(DISTINCT author) FROM notes").Scan(&count)
+	err := conn.QueryRowContext(ctx, "SELECT COUNT(DISTINCT author) FROM notes").Scan(&count)
 	if err != nil {
 		return 0, err
 	}
@@ -28,9 +30,9 @@ func GetUserCount() (int, error) {
 	return count, nil
 }
 
-func GetNoteCount() (int, error) {
+func GetNoteCount(ctx context.Context) (int, error) {
 	var count int
-	err := conn.QueryRow("SELECT COUNT(*) FROM notes").Scan(&count)
+	err := conn.QueryRowContext(ctx, "SELECT COUNT(*) FROM notes").Scan(&count)
 	if err != nil {
 		return 0, err
 	}
@@ -38,9 +40,9 @@ func GetNoteCount() (int, error) {
 	return count, nil
 }
 
-func GetNoteCountByUserMap(steamid string, mapname string) (int, error) {
+func GetNoteCountByUserMap(ctx context.Context, steamid string, mapname string) (int, error) {
 	var count int
-	err := conn.QueryRow("SELECT COUNT(*) FROM notes WHERE author = ? AND map = ?", steamid, mapname).Scan(&count)
+	err := conn.QueryRowContext(ctx, "SELECT COUNT(*) FROM notes WHERE author = ? AND map = ?", steamid, mapname).Scan(&count)
 	if err != nil {
 		return 0, err
 	}
@@ -48,9 +50,9 @@ func GetNoteCountByUserMap(steamid string, mapname string) (int, error) {
 	return count, nil
 }
 
-func GetMapCount() (int, error) {
+func GetMapCount(ctx context.Context) (int, error) {
 	var count int
-	err := conn.QueryRow("SELECT COUNT(DISTINCT map) FROM notes").Scan(&count)
+	err := conn.QueryRowContext(ctx, "SELECT COUNT(DISTINCT map) FROM notes").Scan(&count)
 	if err != nil {
 		return 0, err
 	}
@@ -58,8 +60,8 @@ func GetMapCount() (int, error) {
 	return count, nil
 }
 
-func GetMaps() (map[string]int, error) {
-	r, err := conn.Query("SELECT map, COUNT(map) FROM notes GROUP BY map")
+func GetMaps(ctx context.Context) (map[string]int, error) {
+	r, err := conn.QueryContext(ctx, "SELECT map, COUNT(map) FROM notes GROUP BY map")
 	if err != nil {
 		return nil, err
 	}

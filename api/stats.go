@@ -38,25 +38,25 @@ func Stats(w http.ResponseWriter, r *http.Request) {
 	var sr StatsResponse
 	var err error
 
-	sr.UserCount, err = db.GetUserCount()
+	sr.UserCount, err = db.GetUserCount(r.Context())
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to get user count: %s", err), http.StatusInternalServerError)
 		return
 	}
 
-	sr.NoteCount, err = db.GetNoteCount()
+	sr.NoteCount, err = db.GetNoteCount(r.Context())
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to get note count: %s", err), http.StatusInternalServerError)
 		return
 	}
 
-	sr.MapCount, err = db.GetMapCount()
+	sr.MapCount, err = db.GetMapCount(r.Context())
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to get map count: %s", err), http.StatusInternalServerError)
 		return
 	}
 
-	sr.Maps, err = db.GetMaps()
+	sr.Maps, err = db.GetMaps(r.Context())
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to get maps: %s", err), http.StatusInternalServerError)
 		return

@@ -18,7 +18,10 @@
 
 package db
 
-import "time"
+import (
+	"context"
+	"time"
+)
 
 type Report struct {
 	ID      int       `json:"id"`
@@ -28,8 +31,8 @@ type Report struct {
 	Created time.Time `json:"created"`
 }
 
-func InsertReport(report Report) (int, error) {
-	r, err := conn.Exec("INSERT INTO reports (noteid, steamid, reason) VALUES (?, ?, ?)", report.NoteID, report.SteamID, report.Reason)
+func InsertReport(ctx context.Context, report Report) (int, error) {
+	r, err := conn.ExecContext(ctx, "INSERT INTO reports (noteid, steamid, reason) VALUES (?, ?, ?)", report.NoteID, report.SteamID, report.Reason)
 	if err != nil {
 		return 0, err
 	}
@@ -42,9 +45,9 @@ func InsertReport(report Report) (int, error) {
 	return int(id), nil
 }
 
-func LatestReportTime(steamid string) (time.Time, error) {
+func LatestReportTime(ctx context.Context, steamid string) (time.Time, error) {
 	var created time.Time
-	err := conn.QueryRow("SELECT COALESCE(MAX(created), FROM_UNIXTIME(946702800)) FROM reports WHERE steamid = ?", steamid).Scan(&created)
+	err := conn.QueryRowContext(ctx, "SELECT COALESCE(MAX(created), FROM_UNIXTIME(946702800)) FROM reports WHERE steamid = ?", steamid).Scan(&created)
 	if err != nil {
 		return time.UnixMilli(0), err
 	}

@@ -38,7 +38,7 @@ func Mine(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// steamid
-	steamid, err := db.SteamIDFromToken(token)
+	steamid, err := db.SteamIDFromToken(r.Context(), token)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			common.WriteError(w, r, "invalid token", http.StatusUnauthorized)
@@ -51,7 +51,7 @@ func Mine(w http.ResponseWriter, r *http.Request) {
 
 	var vr ViewResponse
 
-	vr.Notes, err = db.GetNotes("steamid", steamid)
+	vr.Notes, err = db.GetNotes(r.Context(), "steamid", steamid)
 	if err != nil && !errors.Is(err, sql.ErrNoRows) {
 		common.WriteError(w, r, fmt.Sprintf("failed to read notes for map: %s", err), http.StatusInternalServerError)
 		return

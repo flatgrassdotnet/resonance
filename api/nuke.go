@@ -37,7 +37,7 @@ func Nuke(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// steamid
-	steamid, err := db.SteamIDFromToken(token)
+	steamid, err := db.SteamIDFromToken(r.Context(), token)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			common.WriteError(w, r, "invalid token", http.StatusUnauthorized)
@@ -48,7 +48,7 @@ func Nuke(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = db.DeleteUser(steamid)
+	err = db.DeleteUser(r.Context(), steamid)
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to delete user: %s", err), http.StatusInternalServerError)
 		return

@@ -49,7 +49,7 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// steamid
-	steamid, err := db.SteamIDFromToken(token)
+	steamid, err := db.SteamIDFromToken(r.Context(), token)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			common.WriteError(w, r, "invalid token", http.StatusUnauthorized)
@@ -61,7 +61,7 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// owner check
-	owner, err := db.GetNoteOwner(id)
+	owner, err := db.GetNoteOwner(r.Context(), id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			common.WriteError(w, r, "note doesn't exist", http.StatusBadRequest)
@@ -77,7 +77,7 @@ func Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = db.DeleteNote(id)
+	err = db.DeleteNote(r.Context(), id)
 	if err != nil {
 		common.WriteError(w, r, fmt.Sprintf("failed to delete note: %s", err), http.StatusBadRequest)
 		return

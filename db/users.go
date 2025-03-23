@@ -19,6 +19,7 @@
 package db
 
 import (
+	"context"
 	"crypto/rand"
 	"time"
 )
@@ -30,8 +31,8 @@ type User struct {
 	Created time.Time `json:"created"`
 }
 
-func InsertUser(user User) error {
-	_, err := conn.Exec("INSERT IGNORE INTO users (steamid) VALUES (?)", user.SteamID)
+func InsertUser(ctx context.Context, user User) error {
+	_, err := conn.ExecContext(ctx, "INSERT IGNORE INTO users (steamid) VALUES (?)", user.SteamID)
 	if err != nil {
 		return err
 	}
@@ -39,8 +40,8 @@ func InsertUser(user User) error {
 	return nil
 }
 
-func DeleteUser(steamid string) error {
-	_, err := conn.Exec("DELETE FROM users WHERE steamid = ?", steamid)
+func DeleteUser(ctx context.Context, steamid string) error {
+	_, err := conn.ExecContext(ctx, "DELETE FROM users WHERE steamid = ?", steamid)
 	if err != nil {
 		return err
 	}
@@ -48,9 +49,9 @@ func DeleteUser(steamid string) error {
 	return nil
 }
 
-func GetUser(steamid string) (User, error) {
+func GetUser(ctx context.Context, steamid string) (User, error) {
 	var u User
-	err := conn.QueryRow("SELECT steamid, admin, muted, created FROM users WHERE steamid = ?", steamid).Scan(&u.SteamID, &u.Admin, &u.Muted, &u.Created)
+	err := conn.QueryRowContext(ctx, "SELECT steamid, admin, muted, created FROM users WHERE steamid = ?", steamid).Scan(&u.SteamID, &u.Admin, &u.Muted, &u.Created)
 	if err != nil {
 		return User{}, err
 	}
@@ -58,8 +59,8 @@ func GetUser(steamid string) (User, error) {
 	return u, nil
 }
 
-func InsertTicket(steamid string, ticket []byte) error {
-	_, err := conn.Exec("REPLACE INTO tickets (steamid, ticket) VALUES (?, ?)", steamid, ticket)
+func InsertTicket(ctx context.Context, steamid string, ticket []byte) error {
+	_, err := conn.ExecContext(ctx, "REPLACE INTO tickets (steamid, ticket) VALUES (?, ?)", steamid, ticket)
 	if err != nil {
 		return err
 	}
@@ -67,7 +68,7 @@ func InsertTicket(steamid string, ticket []byte) error {
 	return nil
 }
 
-func TokenFromTicket(ticket []byte) ([]byte, error) {
+func TokenFromTicket(ctx context.Context, ticket []byte) ([]byte, error) {
 	token := make([]byte, 32)
 	_, err := rand.Read(token)
 	if err != nil {
@@ -75,17 +76,17 @@ func TokenFromTicket(ticket []byte) ([]byte, error) {
 	}
 
 	var steamid string
-	err = conn.QueryRow("SELECT steamid FROM tickets WHERE ticket = ? AND created > DATE_SUB(UTC_TIMESTAMP(), INTERVAL 5 MINUTE)", ticket).Scan(&steamid)
+	err = conn.QueryRowContext(ctx, "SELECT steamid FROM tickets WHERE ticket = ? AND created > DATE_SUB(UTC_TIMESTAMP(), INTERVAL 5 MINUTE)", ticket).Scan(&steamid)
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = conn.Exec("REPLACE INTO sessions (steamid, token) VALUES (?, ?)", steamid, token)
+	_, err = conn.ExecContext(ctx, "REPLACE INTO sessions (steamid, token) VALUES (?, ?)", steamid, token)
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = conn.Exec("DELETE FROM tickets WHERE ticket = ?", ticket)
+	_, err = conn.ExecContext(ctx, "DELETE FROM tickets WHERE ticket = ?", ticket)
 	if err != nil {
 		return nil, err
 	}
@@ -93,9 +94,9 @@ func TokenFromTicket(ticket []byte) ([]byte, error) {
 	return token, nil
 }
 
-func SteamIDFromToken(token []byte) (string, error) {
+func SteamIDFromToken(ctx context.Context, token []byte) (string, error) {
 	var steamid string
-	err := conn.QueryRow("SELECT steamid FROM sessions WHERE token = ? AND created > DATE_SUB(UTC_TIMESTAMP(), INTERVAL 7 DAY)", token).Scan(&steamid)
+	err := conn.QueryRowContext(ctx, "SELECT steamid FROM sessions WHERE token = ? AND created > DATE_SUB(UTC_TIMESTAMP(), INTERVAL 7 DAY)", token).Scan(&steamid)
 	if err != nil {
 		return "", err
 	}
