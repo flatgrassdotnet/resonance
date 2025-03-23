@@ -1,6 +1,6 @@
 /*
 	resonance - echoes across all your favorite maps
-	Copyright (C) 2025  patapancakes <patapancakes@pagefault.games>
+	Copyright (C) 2025  Pancakes <patapancakes@pagefault.games>
 
 	This program is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Affero General Public License as published by
