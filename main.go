@@ -38,13 +38,14 @@ func main() {
 	// database related
 	dbuser := flag.String("dbuser", "resonance", "database server user name")
 	dbpass := flag.String("dbpass", "", "database server user password")
-	dbaddr := flag.String("dbaddr", "tcp(127.0.0.1)", "database server address")
+	dbproto := flag.String("dbproto", "tcp", "database connection protocol")
+	dbaddr := flag.String("dbaddr", "127.0.0.1", "database server address")
 	dbname := flag.String("dbname", "resonance", "database name")
 
 	flag.Parse()
 
 	// set up database
-	err := db.Init(*dbuser, *dbpass, *dbaddr, *dbname)
+	err := db.Init(*dbuser, *dbpass, *dbproto, *dbaddr, *dbname)
 	if err != nil {
 		log.Fatalf("failed to open database connection: %s", err)
 	}

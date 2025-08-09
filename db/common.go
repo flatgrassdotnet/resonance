@@ -28,9 +28,9 @@ import (
 
 var conn *sql.DB
 
-func Init(username string, password string, address string, name string) error {
+func Init(username string, password string, protocol string, address string, database string) error {
 	var err error
-	conn, err = sql.Open("mysql", fmt.Sprintf("%s:%s@%s/%s?parseTime=true", username, password, address, name))
+	conn, err = sql.Open("mysql", fmt.Sprintf("%s:%s@%s(%s)/%s?parseTime=true", username, password, protocol, address, database))
 	if err != nil {
 		return err
 	}
