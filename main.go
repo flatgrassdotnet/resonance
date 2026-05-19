@@ -29,6 +29,7 @@ import (
 	"resonance/api/login"
 	"resonance/api/note"
 	"resonance/db"
+	"resonance/pages"
 )
 
 func main() {
@@ -54,7 +55,7 @@ func main() {
 	// set up webserver
 
 	// files
-	http.Handle("GET /img/", http.FileServer(http.Dir("data")))
+	http.Handle("GET /img/", http.StripPrefix("/img/", http.FileServerFS(pages.AssetsFS)))
 
 	// login
 	http.HandleFunc("GET /login", login.Login)

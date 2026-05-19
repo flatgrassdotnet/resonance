@@ -16,9 +16,13 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package tmpl
+package pages
 
-import "html/template"
+import (
+	"embed"
+	"html/template"
+	"io/fs"
+)
 
 type MainData struct {
 	Header string
@@ -26,4 +30,14 @@ type MainData struct {
 	Footer string
 }
 
-var Main = template.Must(template.New("main.html").ParseFiles("data/templates/main.html"))
+var (
+	//go:embed templates
+	templates      embed.FS
+	TemplatesFS, _ = fs.Sub(templates, "templates")
+
+	//go:embed assets
+	assets      embed.FS
+	AssetsFS, _ = fs.Sub(assets, "assets")
+
+	Main = template.Must(template.New("main.html").ParseFS(TemplatesFS, "main.html"))
+)

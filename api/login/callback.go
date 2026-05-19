@@ -24,7 +24,7 @@ import (
 	"net/http"
 	"resonance/common"
 	"resonance/db"
-	"resonance/tmpl"
+	"resonance/pages"
 	"strings"
 
 	"github.com/yohcop/openid-go"
@@ -75,11 +75,11 @@ func Callback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var td tmpl.MainData
+	var td pages.MainData
 
 	td.Header = "Authentication Successful"
 	td.Body = "You have been authenticated by Resonance to create Echoes in Echoes Beyond!\nYour authentication key has been saved in garrysmod/data/echoesbeyond/authkey.txt. Do not modify, delete or share this file."
 	td.Footer = "You may now close this window and return to the game."
 
-	tmpl.Main.Execute(w, td)
+	pages.Main.Execute(w, td)
 }
